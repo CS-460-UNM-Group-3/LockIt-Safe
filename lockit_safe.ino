@@ -77,17 +77,21 @@ class Led{
   private:
     int greenLed = 10;
     int yellowLed = 11;
+    int redLed = 13;
 
   public:
     Led(){
       pinMode(greenLed, OUTPUT);
       pinMode(yellowLed, OUTPUT);
+      pinMode(redLed, OUTPUT);
     }
     void on(String color){
       if(color == "green")
         digitalWrite(greenLed, HIGH);
       else if(color == "yellow")
         digitalWrite(yellowLed, HIGH);
+      else if(color == "red")
+        digitalWrite(redLed, HIGH);
     }
 
     void off(String color){
@@ -95,6 +99,8 @@ class Led{
         digitalWrite(greenLed, LOW);
       else if(color == "yellow")
         digitalWrite(yellowLed, LOW);
+      else if(color == "red")
+        digitalWrite(redLed, LOW);
     }
   
 };
@@ -142,7 +148,7 @@ class Timer{
   private:
     double startTime = millis();
     boolean isReset = true;
-    boolean isTimeout = false;
+    //boolean isTimeout = false;
 
   public:
     void setTimer(){
@@ -156,7 +162,7 @@ class Timer{
       isReset = true;
     }
 
-    boolean isTimeOut(){
+    boolean isTimeout(){
       if (!isReset){
         return millis()-startTime>10000.0;
       }
@@ -253,11 +259,13 @@ void loop() {
             goIdle();
           }
         }else{
-          //red Led?
+          notif.blinkLed("red");
+          buzzerAlert();
           goIdle();
         }
       }else{
-        //red led?
+        notif.blinkLed("red");
+        buzzerAlert();
         goIdle();
       }
     }
@@ -287,10 +295,14 @@ void loop() {
           goIdle();
         }
       }else{
+        notif.blinkLed("red");
+        buzzerAlert();
         goIdle();
       }
     }
   }else{
+    notif.blinkLed("red");
+    buzzerAlert();
     goIdle();
   }
 }
@@ -298,7 +310,7 @@ void loop() {
 
 boolean getPasscode(int len){
    while(true){
-     if(!t.isTimeOut()){
+     if(!t.isTimeout()){
       userInput.start();
       char k = userInput.getkey();
       if(k!=0){
@@ -311,13 +323,15 @@ boolean getPasscode(int len){
           }
           t.setTimer();
         }else{
-          //red led?
+          notif.blinkLed("red");
+          buzzerAlert();
           goIdle();
           return false; 
         }
       } 
     }else{
-      //red led?
+      notif.blinkLed("red");
+      buzzerAlert();
       goIdle();
       return false;
     }
@@ -329,4 +343,11 @@ void goIdle(){
   t.resetTimer();
   passcode = "";
   userInput.clearQueue();
+}
+
+
+void buzzerAlert(){
+  notif.startBuzzer();
+  delay(250);
+  notif.stopBuzzer();
 }
